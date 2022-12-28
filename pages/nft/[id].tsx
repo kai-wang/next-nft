@@ -1,6 +1,15 @@
 import React from "react";
+import { useAddress, useDisconnect, useMetamask } from "@thirdweb-dev/react";
 
 function NFTDropPage() {
+  // Auth
+  const connectWithMetamask = useMetamask();
+  const address = useAddress();
+  const disconnect = useDisconnect();
+
+  console.log(address);
+  // --
+
   return (
     <div className="flex h-screen flex-col lg:grid lg:grid-cols-10">
       {/** left side */}
@@ -31,25 +40,34 @@ function NFTDropPage() {
             </span>{" "}
             Marketplace
           </h1>
-          <button className="rounded-4 bg-rose-400 text-white py-2 text-xs font-bold lg:px-5 lg:py-3 lg:text-base">
-            Sign In
+          <button
+            className="rounded-4 bg-rose-400 text-white py-2 text-xs font-bold lg:px-5 lg:py-3 lg:text-base"
+            onClick={() => (address ? disconnect() : connectWithMetamask())}
+          >
+            {address ? "Sign Out" : "Sign In"}
           </button>
         </header>
         <hr className="my-2 border" />
+        {address && <p className="text-center text-sm text-rose-400">You are logged in with wallet address {address.substring(0,5)}...{address.substring(address.length - 5)}</p>}
         {/** content */}
 
         <div className="mt-10 flex flex-1 flex-col items-center space-y-3 text-center lg:space-y-0 lg:justify-center">
-          <img className="w-80 object-cover pb-10 lg:h-40" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSItQxHkvWdVVRpXfkFQ4XuQFhmst8UgbRGKA&usqp=CAU" alt="" />
+          <img
+            className="w-80 object-cover pb-10 lg:h-40"
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSItQxHkvWdVVRpXfkFQ4XuQFhmst8UgbRGKA&usqp=CAU"
+            alt=""
+          />
 
-          <h1 className="text-3xl font-bold lg:text-5xl lg:font-extrabold">NFT Drop</h1>
+          <h1 className="text-3xl font-bold lg:text-5xl lg:font-extrabold">
+            NFT Drop
+          </h1>
 
           <p className="pt-2 text-xl text-green-500">13 / 21 NFT's claimed</p>
         </div>
 
-
         {/** mint button */}
         <button className="h-16 w-full bg-red-500 text-white rounded-full mt-10 font-boldgit remote add origin git@github.com:kai-wang/next-nft.git">
-            Mint NFT (0.01 ETH)
+          Mint NFT (0.01 ETH)
         </button>
       </div>
     </div>
