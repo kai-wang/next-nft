@@ -1,22 +1,45 @@
-import React from "react";
-import { useAddress, useDisconnect, useMetamask } from "@thirdweb-dev/react";
+import React, { useEffect, useState } from "react";
+import { useAddress, useDisconnect, useMetamask, useContract, useNFTDrop} from "@thirdweb-dev/react";
 import { GetServerSideProps } from "next";
 import { sanityClient, urlFor } from "../../sanity";
 import { Collection } from "../../typings";
 import Link from "next/link";
+import { BigNumber } from "ethers";
 
 interface Props {
   collection: Collection;
 }
 
 function NFTDropPage({ collection }: Props) {
+  const [claimedSupply, setClaimedSupply] = useState<number>(0);
+  const [totalSupply, setTotalSupply] = useState<BigNumber>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const nftDrop = useContract(collection.address, 'nft-drop').contract;
+
   // Auth
   const connectWithMetamask = useMetamask();
   const address = useAddress();
   const disconnect = useDisconnect();
-
-  console.log(address);
   // --
+
+  useEffect(() => {
+    if(!nftDrop) return;
+
+    const fetchNFTDropData = async () => {
+
+      setLoading(true);
+      const claimed = await nftDrop.getAllClaimed();
+      const total = await nftDrop.totalSupply();
+
+      setClaimedSupply(claimed.length);
+      setTotalSupply(total);
+      setLoading(false);
+
+    };
+
+    fetchNFTDropData();
+
+  }, [nftDrop])
 
   return (
     <div className="flex h-screen flex-col lg:grid lg:grid-cols-10">
@@ -79,11 +102,21 @@ function NFTDropPage({ collection }: Props) {
             {collection.title}
           </h1>
 
-          <p className="pt-2 text-xl text-green-500">13 / 21 NFT's claimed</p>
+          {loading ? (
+            <p className="animate-pulse pt-2 text-xl text-green-500">
+              Loading Supply Count
+            </p>
+          ) : (
+            <p className="pt-2 text-xl text-green-500"> {claimedSupply} / {totalSupply?.toString()} NFT's claimed</p>
+          )}
+
+          {loading && (
+            <img className="h-80 w-80 object-contain" src='https://media.tenor.com/6gHLhmwO87sAAAAi/gg.gif' alt="" />
+          )}
         </div>
 
         {/** mint button */}
-        <button className="h-16 w-full bg-red-500 text-white rounded-full mt-10 font-boldgit remote add origin git@github.com:kai-wang/next-nft.git">
+        <button className="h-16 w-full bg-red-500 text-white rounded-full mt-10 font-bold">
           Mint NFT (0.01 ETH)
         </button>
       </div>
