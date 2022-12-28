@@ -9,7 +9,7 @@ type Props = {
   collections: Collection[];
 };
 
-const Home: NextPage = ({ collections }: Props) => {
+const Home = ({ collections }: Props) => {
   return (
     <div className="mx-auto max-w-7xl flex flex-col py-20 px-10 2xl:px-0 min-h-screen">
       <Head>
